@@ -4,7 +4,7 @@ import os
 from time import sleep
 
 mypath = input("Enter path: ")
-onlyfiles = [f for f in listdir(mypath)]
+filesFolder = [f for f in listdir(mypath)]
 ffmpegPATH = input("Enter ffmpeg path (type PATH if is in env variables): ")
 
 if ffmpegPATH != "PATH":
@@ -12,9 +12,10 @@ if ffmpegPATH != "PATH":
 else:
     print("Using ffmpeg from env variables")
 
-vbr = input("Enter VBR: ")
+vbr = input("Enter VBR (from 1 to 5 [2 is recommended]): ")
+os.system("ffmpeg -version")
 
-for x in onlyfiles:
+for x in filesFolder:
     if x.find("flac") == -1:
         continue
 
