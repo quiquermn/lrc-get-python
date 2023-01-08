@@ -7,6 +7,7 @@ from time import sleep
 mypath = input("Enter path: ")
 onlyfiles = [f for f in listdir(mypath)]
 ffmpegPATH = input("Enter ffmpeg path: ")
+vbr = input("Enter VBR: ")
 os.chdir(ffmpegPATH)
 
 for x in onlyfiles:
@@ -22,7 +23,7 @@ for x in onlyfiles:
     # ffmpeg -i input.mp3 -c:a aac -q 4 output.m4a
 
     ffmpegCommand = "ffmpeg -i " + flacFile + \
-        " -c:a aac -q 4 -map a " + finalFile
+        " -c:a libfdk_aac -vbr " + vbr + " -map a " + finalFile
     # print(ffmpegCommand)
     os.system(ffmpegCommand)
     sleep(1)
