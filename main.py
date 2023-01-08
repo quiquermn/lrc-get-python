@@ -1,6 +1,5 @@
 # iterate all files in folder and print file name
 from os import listdir
-from os.path import isfile, join
 import os
 from time import sleep
 
