@@ -1,1 +1,3 @@
-# flac-to-aac_ffmpeg
+# Implementation of lrc-get in python
+
+## Usage
