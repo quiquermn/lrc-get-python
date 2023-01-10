@@ -1,56 +1,86 @@
 """"
 Based on https://github.com/tranxuanthang/lrcget.git
 
-This script will take an audio file path, search for synced lyrics on lrclib.net and print them to the console.
+This script will take an audio file path, search for synced lyrics on lrclib.net and save them to a txt file.
 
 """
+
+# -*- coding: utf-8 -*-
 import requests
-import audioread
-import audio_metadata
+import os
+import ffmpeg
 
 
 def fetch_lyrics(artist, title, album, totalsec):
     lrcLib = 'https://lrclib.net/api/get'
 
-    print("Searching for: " + artist + ", " + album + ", " + title)
-
     params = dict(artist_name=artist,
                   track_name=title,
                   album_name=album,
                   duration=totalsec,)
-    res = requests.get(lrcLib, params=params)
+    # HTTP request error handling
+    try:
+        res = requests.get(lrcLib, params=params)
+        res.raise_for_status()
 
-    # print(res.json())
+    except requests.exceptions.HTTPError as err:  # In case of error the error will be printed
+        print(err)
 
-    if res.json()["plainLyrics"] == None:
-        print("Lyrics not found")
-        exit()
+    # In case of no errors the main code will execute
 
-    syncedLyrics = res.json()["syncedLyrics"]
-
-    if syncedLyrics is None:
-        print("Synced lyrics not found")
-
-        if input("Press Y to search for lyrics without sync: ") == "Y" or "y":
-            return res.json()["plainLyrics"]
     else:
-        return syncedLyrics
+        if res.json()["plainLyrics"] == None:
+            print("Lyrics not available for: {} - {}, by {}".format(
+                title, album, artist))
+            return
 
+        syncedLyrics = res.json()["syncedLyrics"]
+
+        if syncedLyrics is None:
+            print("Synced lyrics not found for: {} - {}, by {}".format(
+                title, album, artist))
+        else:
+            print("Lyrics found for: {} - {}, by {}".format(title, album, artist))
+            return syncedLyrics
 
 # -----------------------------------------------------------------------------------
-# Begin audio file search
 
-audio = input("Enter music file path: ")
 
-with audioread.audio_open(audio) as f:
+workingFolder = input("Enter audio folder: ")
+os.chdir(workingFolder)
 
-    # totalsec contains the length in float
-    totalsec = f.duration
 
-metadata = audio_metadata.load(audio)
-tags = metadata["tags"]
-artist = tags["artist"][0]
-album = tags["album"][0]
-title = tags["title"][0]
+filesFolder = [f for f in os.listdir(os.curdir)]
 
-print(fetch_lyrics(artist, title, album, totalsec))
+for x in filesFolder:
+    # Skip scanning of lrc files
+    if os.path.splitext(x)[1] == ".lrc":
+        continue
+
+    # Read metadata from audio file using ffprobe
+    try:  # Check for metadata found in m4a files
+        audioTags = ffmpeg.probe(x)["format"]["tags"]
+        artist = audioTags["artist"]
+        title = audioTags["title"]
+        album = audioTags["album"]
+        duration = str(round(float(ffmpeg.probe(x)["format"]["duration"])))
+    except:
+        try:  # Check for metadata found in flac files
+            artist = audioTags["ARTIST"]
+            title = audioTags["TITLE"]
+            album = audioTags["ALBUM"]
+            duration = str(round(float(ffmpeg.probe(x)["format"]["duration"])))
+        except:  # If no metadata found, skip the file
+            continue
+
+    # Search for lyrics using the data read before
+    syncedLyrics = fetch_lyrics(artist, title, album, duration)
+
+    # Replace file extension with .lrc
+    fileName = x.replace(os.path.splitext(x)[1], ".lrc")
+
+    # Save lyrics to a file
+    if syncedLyrics is not None:  # Check if lyrics were found
+        with open(fileName, "w", encoding="utf-8") as text_file:
+            text_file.write(syncedLyrics)
+            text_file.close()

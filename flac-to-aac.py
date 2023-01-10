@@ -1,4 +1,3 @@
-# iterate all files in folder and print file name
 from os import listdir
 import os
 from time import sleep
