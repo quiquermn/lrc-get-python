@@ -1,7 +1,7 @@
 """"
 Based on https://github.com/tranxuanthang/lrcget.git
 
-This script will take an audio file path, search for synced lyrics on lrclib.net and save them to a txt file.
+This script will take an audio file path, search for synced lyrics on lrclib.net and save them to a lrc file.
 
 """
 
