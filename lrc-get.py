@@ -18,13 +18,22 @@ def fetch_lyrics(artist, title, album, totalsec):
                   track_name=title,
                   album_name=album,
                   duration=totalsec,)
-    # HTTP request error handling
+
+    paramsExplicit = dict(artist_name=artist,
+                          track_name=title+" (Explicit)",
+                          album_name=album,
+                          duration=totalsec,)
+    # HTTP request error handling and explicit fallback
     try:
         res = requests.get(lrcLib, params=params)
         res.raise_for_status()
 
-    except requests.exceptions.HTTPError as err:  # In case of error the error will be printed
-        print(err)
+    except requests.exceptions.HTTPError as err:
+        try:
+            # Try with explicit
+            res = requests.get(lrcLib, params=paramsExplicit)
+        except requests.exceptions.HTTPError as err:
+            print(err)  # In case of error the error will be printed
 
     # In case of no errors the main code will execute
 
