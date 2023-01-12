@@ -5,7 +5,6 @@ This script will take an audio file path, search for synced lyrics on lrclib.net
 
 """
 
-# -*- coding: utf-8 -*-
 import requests
 import os
 import ffmpeg
@@ -32,15 +31,15 @@ args = parser.parse_args()
 def fetch_lyrics(artist, title, album, totalsec):
     lrcLib = 'https://lrclib.net/api/get'
 
-    params = dict(artist_name=artist,
-                  track_name=title,
-                  album_name=album,
-                  duration=totalsec,)
+    params = {'artist_name': artist,
+              'track_name': title,
+              'album_name': album,
+              'duration': totalsec}
 
-    paramsExplicit = dict(artist_name=artist,
-                          track_name=title+" (Explicit)",
-                          album_name=album,
-                          duration=totalsec,)
+    paramsExplicit = {'artist_name': artist,
+                      'track_name': title + " (Explicit)",
+                      'album_name': album,
+                      'duration': totalsec}
 
     # HTTP request error handling and explicit fallback
     # Help I don't even understand python
@@ -52,17 +51,19 @@ def fetch_lyrics(artist, title, album, totalsec):
         try:
             # Try with explicit
             res = requests.get(lrcLib, params=paramsExplicit)
-            print(
-                "Using explicit fallback for: {} - {}, by {}".format(title, album, artist))
+            print("Using explicit fallback for: {} - {}, by {}".format(title, album, artist))
         except requests.exceptions.HTTPError as err:
             print(err)  # In case of error the error will be printed
             return
 
     finally:
-        if res.json()["plainLyrics"] == None:
-            print("Lyrics not available for: {} - {}, by {}".format(
+        try:
+            if res.json()["plainLyrics"] is None:
+                print("Lyrics not available for: {} - {}, by {}".format(
                 title, album, artist))
             return
+        except:
+            print("Error")
 
         syncedLyrics = res.json()["syncedLyrics"]
 
@@ -72,6 +73,7 @@ def fetch_lyrics(artist, title, album, totalsec):
         else:
             print("Lyrics found for: {} - {}, by {}".format(title, album, artist))
             return syncedLyrics
+
 
 # -----------------------------------------------------------------------------------
 # Main code starts here
@@ -90,7 +92,7 @@ filesWithLRC = list()
 
 def checkLRC(file):
     # check for existing lrc file and replace the file if it exists and the user wants to replace
-    if (os.path.splitext(file)[1] == ".lrc" or (os.path.splitext(file)[0] in filesWithLRC)):
+    if os.path.splitext(file)[1] == ".lrc" or (os.path.splitext(file)[0] in filesWithLRC):
 
         filesWithLRC.append(os.path.splitext(file)[0])  # Append file to list
 
@@ -113,17 +115,17 @@ for x in filesFolder:
 
     # Read metadata from audio file using ffprobe
     try:  # Check for metadata found in m4a files
-        audioTags = ffmpeg.probe(x)["format"]["tags"]
+        audioTags = ffmpeg.probe(x)["f_format"]["tags"]
         artist = audioTags["artist"]
         title = audioTags["title"]
         album = audioTags["album"]
-        duration = str(round(float(ffmpeg.probe(x)["format"]["duration"])))
+        duration = str(round(float(ffmpeg.probe(x)["f_format"]["duration"])))
     except:
         try:  # Check for metadata found in flac files
             artist = audioTags["ARTIST"]
             title = audioTags["TITLE"]
             album = audioTags["ALBUM"]
-            duration = str(round(float(ffmpeg.probe(x)["format"]["duration"])))
+            duration = str(round(float(ffmpeg.probe(x)["f_format"]["duration"])))
         except:  # If no metadata found, replace the file
             continue
 
@@ -133,8 +135,7 @@ for x in filesFolder:
     # Replace file extension with .lrc
 
     if args.output:
-        fileName = args.output + "\\" + \
-            x.replace(os.path.splitext(x)[1], ".lrc")
+        fileName = args.output + "\\" + x.replace(os.path.splitext(x)[1], ".lrc")
     else:
         fileName = x.replace(os.path.splitext(x)[1], ".lrc")
 
