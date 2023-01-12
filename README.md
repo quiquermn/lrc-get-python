@@ -1,7 +1,12 @@
 # Implementation of lrc-get in python
 
-## Usage
-`python .\lrc_get.py -i [INPUT-FOLDER] -o (optional) [OUTPUT-FOLDER]  -r (Optional [Replaces existing lyrics files])`
+## How to use
+`python .\lrc_get.py -i [INPUT-FOLDER])`
+
+## Examples
+- `python .\lrc_get.py -i "C:\music\Lit Killah - SnipeZ "`
+- `python .\lrc_get.py -i "C:\music\Lit Killah - SnipeZ " -o "C:\music\lyrics"` (lyrics will be saved to output folder)
+- `python .\lrc_get.py -i "C:\music\Lit Killah - SnipeZ " -r` (existing lyrics will be replaced)
 
 ## Arguments
 - `-i` or `--input`  : Path of audio files  <br>
@@ -14,13 +19,14 @@
 3. Install dependencies
     - `pip install -r requirements.txt`
 
-### TODO:
+## TODO:
 - [ ] Don't use ffmpeg
 - [ ] Add GUI
 - [ ] Manual search for lyrics
 
-### Notes
+## Notes
 I'm not very good with python and english is not my main language, so I would greatly appreciate your help in my little project
 
+<hr>
 
 #### Based on the work by @tranxuanthang in https://github.com/tranxuanthang/lrcget
