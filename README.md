@@ -8,11 +8,19 @@
 - `-o` or `--output` : (OPTIONAL) Output folder of lyrics files <br>
 - `-r` or `--replace`: (OPTIONAL) If present, replaces existing .lrc files <br>
 
-## Requirements
-- Python 3.11 or higher
+## Installation
+1. Clone this repository
+2. Install ffmpeg and add it to PATH
+3. Install dependencies
+    - `pip install -r requirements.txt`
 
-## Notes
+### TODO:
+- [ ] Don't use ffmpeg
+- [ ] Add GUI
+- [ ] Manual search for lyrics
+
+### Notes
 I'm not very good with python and english is not my main language, so I would greatly appreciate your help in my little project
 
 
-### Based on the work by @tranxuanthang in https://github.com/tranxuanthang/lrcget
+#### Based on the work by @tranxuanthang in https://github.com/tranxuanthang/lrcget
