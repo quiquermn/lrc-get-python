@@ -2,3 +2,4 @@
 .vscode/**
 out.txt
 flac-to-aac.py
+/__pycache__
